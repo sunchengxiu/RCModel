@@ -21,6 +21,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     // 测试，获取person类的所有属性的编码
     unsigned int count;
     objc_property_t *property = class_copyPropertyList(person.class, &count);

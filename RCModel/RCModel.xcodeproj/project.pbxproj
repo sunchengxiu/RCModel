@@ -11,6 +11,9 @@
 		E84D498D2132884C0078B0D3 /* NSObject+RCModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E84D498C2132884C0078B0D3 /* NSObject+RCModel.m */; };
 		E86B12612136331C008858DC /* person.m in Sources */ = {isa = PBXBuildFile; fileRef = E86B12602136331C008858DC /* person.m */; };
 		E86B1265213642B3008858DC /* son.m in Sources */ = {isa = PBXBuildFile; fileRef = E86B1264213642B3008858DC /* son.m */; };
+		E875A67A2175C791003F9B52 /* RCModelMeta.m in Sources */ = {isa = PBXBuildFile; fileRef = E875A6792175C791003F9B52 /* RCModelMeta.m */; };
+		E875A67F2175EFB5003F9B52 /* RCModelPropertyMeta.m in Sources */ = {isa = PBXBuildFile; fileRef = E875A67E2175EFB5003F9B52 /* RCModelPropertyMeta.m */; };
+		E875A6872176D5D0003F9B52 /* RCModelTool.m in Sources */ = {isa = PBXBuildFile; fileRef = E875A6862176D5D0003F9B52 /* RCModelTool.m */; };
 		E8E9449F213287A10018A832 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = E8E9449E213287A10018A832 /* AppDelegate.m */; };
 		E8E944A2213287A10018A832 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = E8E944A1213287A10018A832 /* ViewController.m */; };
 		E8E944A5213287A10018A832 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = E8E944A3213287A10018A832 /* Main.storyboard */; };
@@ -47,6 +50,14 @@
 		E86B12602136331C008858DC /* person.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = person.m; sourceTree = "<group>"; };
 		E86B1263213642B3008858DC /* son.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = son.h; sourceTree = "<group>"; };
 		E86B1264213642B3008858DC /* son.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = son.m; sourceTree = "<group>"; };
+		E875A6782175C791003F9B52 /* RCModelMeta.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCModelMeta.h; sourceTree = "<group>"; };
+		E875A6792175C791003F9B52 /* RCModelMeta.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCModelMeta.m; sourceTree = "<group>"; };
+		E875A67B2175D0A2003F9B52 /* RCModelProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCModelProtocol.h; sourceTree = "<group>"; };
+		E875A67D2175EFB5003F9B52 /* RCModelPropertyMeta.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCModelPropertyMeta.h; sourceTree = "<group>"; };
+		E875A67E2175EFB5003F9B52 /* RCModelPropertyMeta.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCModelPropertyMeta.m; sourceTree = "<group>"; };
+		E875A6812175F8B9003F9B52 /* RCModelDefine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCModelDefine.h; sourceTree = "<group>"; };
+		E875A6852176D5D0003F9B52 /* RCModelTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCModelTool.h; sourceTree = "<group>"; };
+		E875A6862176D5D0003F9B52 /* RCModelTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCModelTool.m; sourceTree = "<group>"; };
 		E8E9449A213287A10018A832 /* RCModel.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = RCModel.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		E8E9449D213287A10018A832 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		E8E9449E213287A10018A832 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -93,10 +104,18 @@
 		E84D49872132880A0078B0D3 /* RCModel */ = {
 			isa = PBXGroup;
 			children = (
+				E875A6812175F8B9003F9B52 /* RCModelDefine.h */,
+				E875A67B2175D0A2003F9B52 /* RCModelProtocol.h */,
 				E84D4988213288360078B0D3 /* RCClassInfo.h */,
 				E84D4989213288360078B0D3 /* RCClassInfo.m */,
+				E875A6782175C791003F9B52 /* RCModelMeta.h */,
+				E875A6792175C791003F9B52 /* RCModelMeta.m */,
+				E875A67D2175EFB5003F9B52 /* RCModelPropertyMeta.h */,
+				E875A67E2175EFB5003F9B52 /* RCModelPropertyMeta.m */,
 				E84D498B2132884C0078B0D3 /* NSObject+RCModel.h */,
 				E84D498C2132884C0078B0D3 /* NSObject+RCModel.m */,
+				E875A6852176D5D0003F9B52 /* RCModelTool.h */,
+				E875A6862176D5D0003F9B52 /* RCModelTool.m */,
 			);
 			path = RCModel;
 			sourceTree = "<group>";
@@ -290,13 +309,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E875A6872176D5D0003F9B52 /* RCModelTool.m in Sources */,
 				E8E944A2213287A10018A832 /* ViewController.m in Sources */,
 				E8E944AD213287A30018A832 /* main.m in Sources */,
 				E86B12612136331C008858DC /* person.m in Sources */,
 				E8E9449F213287A10018A832 /* AppDelegate.m in Sources */,
 				E84D498D2132884C0078B0D3 /* NSObject+RCModel.m in Sources */,
+				E875A67A2175C791003F9B52 /* RCModelMeta.m in Sources */,
 				E86B1265213642B3008858DC /* son.m in Sources */,
 				E84D498A213288360078B0D3 /* RCClassInfo.m in Sources */,
+				E875A67F2175EFB5003F9B52 /* RCModelPropertyMeta.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

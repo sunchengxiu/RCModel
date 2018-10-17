@@ -3,6 +3,7 @@
 //  RCModel
 //
 //  Created by 孙承秀 on 2018/8/26.
+//  Thank you for YY
 //  Copyright © 2018 RongCloud. All rights reserved.
 //
 
@@ -227,7 +228,7 @@ RCEncodingType RCGetEncodingType(const char *encodingType){
             {
                 if (attribute.value) {
                     _typeEncoding = [NSString stringWithUTF8String:attribute.value];
-                    _type = RCGetEncodingType(attribute.value);
+                    type = RCGetEncodingType(attribute.value);
                     if ((type & RCEncodingTypeMask) == RCEncodingTypeObject && _typeEncoding.length) {
                         NSScanner *scanner = [NSScanner scannerWithString:_typeEncoding];
                         // 是否以@\开头
@@ -351,6 +352,7 @@ RCEncodingType RCGetEncodingType(const char *encodingType){
     if (!_metaCls) {
         _metaCls = objc_getMetaClass(class_getName(cls));
     }
+    [self _update];
     _superClsInfo = [self.class classInfoWithClass:_superCls];
     return self;
     
