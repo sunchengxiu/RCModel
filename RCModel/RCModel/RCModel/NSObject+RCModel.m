@@ -2,13 +2,19 @@
 //  NSObject+RCModel.m
 //  RCModel
 //
-//  Created by 孙承秀 on 2018/8/26.
+//  Copyed and modified by 孙承秀 on 2018/8/26.
 //  Thank you for YY
-//  Copyright © 2018 RongCloud. All rights reserved.
+//  YYKit <https://github.com/ibireme/YYKit>
 //
-
+//  Created by ibireme on 15/5/9.
+//  Copyright (c) 2015 ibireme.
+//
+//  This source code is licensed under the MIT-style license found in the
+//  LICENSE file in the root directory of this source tree.
+//
 #import "NSObject+RCModel.h"
 #import "RCModelMeta.h"
+#import "RCModelProtocol.h"
 @implementation NSObject (RCModel)
 
 /**
@@ -26,7 +32,16 @@
         NSLog(@"dic is not NSDictionary class");
         return nil;
     }
+    Class cls = [self class];
+    RCModelMeta *modelMeta = [RCModelMeta metaWithClass:cls];
+    if (modelMeta.isCustomClassFromDictionary) {
+        cls = [(id<RCModelProtocol>)cls modelCustomClassForDictionary:dic];
+    }
+    
     return nil;
+}
+- (BOOL)modelSetWithDictionary:(NSDictionary *)dic{
+    return YES;
 }
 @end
 

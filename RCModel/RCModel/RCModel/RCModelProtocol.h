@@ -2,9 +2,15 @@
 //  RCModelProtocol.h
 //  RCModel
 //
-//  Created by 孙承秀 on 2018/10/16.
+//  Copyed and modified by 孙承秀 on 2018/8/26.
 //  Thank you for YY
-//  Copyright © 2018年 RongCloud. All rights reserved.
+//  YYKit <https://github.com/ibireme/YYKit>
+//
+//  Created by ibireme on 15/5/9.
+//  Copyright (c) 2015 ibireme.
+//
+//  This source code is licensed under the MIT-style license found in the
+//  LICENSE file in the root directory of this source tree.
 //
 
 #import <Foundation/Foundation.h>
@@ -55,7 +61,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return 自定义映射
  */
-+ (nullable NSDictionary <NSString * , NSString *>*)modelCustomClassForDictionary;
++ (nullable Class)modelCustomClassForDictionary:(NSDictionary *)dictionary;
 /**
  自定义键值对
  如果，我们的模型属性字段和 json 不对应，那么可以通过这个方法来自定义模型和json的键值对应关系

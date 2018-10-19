@@ -2,20 +2,46 @@
 //  RCModelMeta.m
 //  RCModel
 //
-//  Created by 孙承秀 on 2018/10/16.
+//  Copyed and modified by 孙承秀 on 2018/8/26.
 //  Thank you for YY
-//  Copyright © 2018年 RongCloud. All rights reserved.
+//  YYKit <https://github.com/ibireme/YYKit>
+//
+//  Created by ibireme on 15/5/9.
+//  Copyright (c) 2015 ibireme.
+//
+//  This source code is licensed under the MIT-style license found in the
+//  LICENSE file in the root directory of this source tree.
 //
 
 #import "RCModelMeta.h"
 #import "RCClassInfo.h"
 #import "RCModelProtocol.h"
 #import "RCModelPropertyMeta.h"
+#import "RCModelTool.h"
 #import <OBJC/runtime.h>
 @interface RCModelMeta()
 {
     RCClassInfo *_classInfo;
+    RCEncodingNSType _nsType;
+    NSMutableArray *_keyPathsArr;
+    NSMutableArray *_mutiKeyPathArr;
+    NSMutableDictionary *_mapper;
 }
+
+/**
+ 所有的 propertyMeta 信息
+ */
+@property(nonatomic , copy )NSArray *allPropertyMetaArrs;
+
+/**
+ 自定义属性映射
+ */
+@property(nonatomic , assign )BOOL isCustomClassFromDictionary;
+
+/**
+ 映射数量
+ */
+@property(nonatomic , assign )NSUInteger keyMapCount;
 @end
 @implementation RCModelMeta
 - (instancetype)initWithClass:(Class)cls{
@@ -94,11 +120,101 @@
         }
     }
     _allPropertyMetaArrs = allPropertys.allValues.copy;
-    NSMutableDictionary *keyPaths = [NSMutableDictionary dictionary];
-    NSMutableDictionary *mutiKeyPaths = [NSMutableDictionary dictionary];
+    NSMutableDictionary *mapper = [NSMutableDictionary dictionary];
+    NSMutableArray *keyPaths = [NSMutableArray array];
+    NSMutableArray *mutiKeyPaths = [NSMutableArray array];
     
-    // 自定义映射
+    // 自定义键值对映射
+    if ([cls respondsToSelector:@selector(modelCustomPropertyMapper)]) {
+        NSDictionary *customMapper = [(id<RCModelProtocol>)cls modelCustomPropertyMapper];
+        [customMapper enumerateKeysAndObjectsUsingBlock:^(NSString *  _Nonnull propertyName, NSString *  _Nonnull map, BOOL * _Nonnull stop) {
+            // 去掉特殊映射
+            RCModelPropertyMeta *propertyMeta = allPropertys[propertyName];
+            if (propertyMeta != nil) {
+                [allPropertys removeObjectForKey:propertyName];
+            }
+            // 简单键值对映射
+            if ([map isKindOfClass:[NSString class]]) {
+                if (map.length == 0 ) {
+                    return ;
+                }
+                propertyMeta.mapToKey = map;
+                // keypath 键值对映射
+                NSArray *keyPath = [map componentsSeparatedByString:@"."];
+                for (NSString *value in keyPath) {
+                    if (value.length == 0) {
+                        NSMutableArray *values = keyPath.mutableCopy;
+                        [values removeObject:@""];
+                        keyPath = values.copy;
+                        break;
+                    }
+                }
+                if (keyPath.count > 0) {
+                    propertyMeta.mapToKeyPath = keyPath;
+                    [keyPaths addObject:propertyMeta];
+                }
+                // 多个属性映射同一个可以
+                /*
+                 {
+                    @"id":@"id",
+                    "uid":@"id",
+                    "userID":@"id"
+                 }
+                 */
+                propertyMeta.next = mapper[map]?:nil;
+                mapper[map] = propertyMeta;
+            } else if ([map isKindOfClass:[NSArray class]]){
+                NSArray *mapArr = (NSArray *)map;
+                NSMutableArray *keyArray = [NSMutableArray array];
+                for (NSString *key in mapArr) {
+                    if (key == nil) {
+                        return;
+                    }
+                    if (key.length == 0 ) {
+                        return;
+                    }
+                    NSArray *keypaths = [key componentsSeparatedByString:@"."];
+                    // @"bookID": @[@"id", @"ext.ID", @"book_id"]}
+                    if (keyPaths.count > 0) {
+                        [keyArray addObject:keyPaths];
+                    } else {
+                        [keyArray addObject:key];
+                    }
+                    if (!propertyMeta.mapToKey) {
+                        propertyMeta.mapToKey = key;
+                        propertyMeta.mapToKeyPath = keyPaths.count > 0 ? keypaths : nil;
+                    }
+                }
+                if (!propertyMeta.mapToKey) {
+                    return;
+                }
+                propertyMeta.mapToArray = keyArray;
+                [mutiKeyPaths addObject:propertyMeta];
+                propertyMeta.next = mapper[map]?:nil;
+                mapper[map] = propertyMeta;
+            }
+        }];
+    }
     
+    // 其余剩下的没有自定义的键值对映射
+    [allPropertys enumerateKeysAndObjectsUsingBlock:^(NSString *  _Nonnull key, RCModelPropertyMeta *  _Nonnull propertyMeta, BOOL * _Nonnull stop) {
+        propertyMeta.mapToKey = key;
+        propertyMeta.next = mapper[key]?:nil;
+        mapper[key] = propertyMeta;
+    }];
+    if (mapper) {
+        _mapper = mapper;
+    }
+    if (keyPaths) {
+        _keyPathsArr = keyPaths;
+    }
+    if (mutiKeyPaths) {
+        _mutiKeyPathArr = mutiKeyPaths;
+    }
+    _classInfo = classInfo;
+    _nsType = RCClassGetNSType(cls);
+    _keyMapCount = _allPropertyMetaArrs.count;
+    _isCustomClassFromDictionary = [cls respondsToSelector:@selector(modelCustomClassForDictionary:)];
     return nil;
 }
 + (instancetype)metaWithClass:(Class)cls{

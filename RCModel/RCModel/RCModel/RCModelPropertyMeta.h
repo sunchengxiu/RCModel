@@ -2,8 +2,15 @@
 //  RCModelPropertyMeta.h
 //  RCModel
 //
-//  Created by 孙承秀 on 2018/10/16.
-//  Copyright © 2018年 RongCloud. All rights reserved.
+//  Copyed and modified by 孙承秀 on 2018/8/26.
+//  Thank you for YY
+//  YYKit <https://github.com/ibireme/YYKit>
+//
+//  Created by ibireme on 15/5/9.
+//  Copyright (c) 2015 ibireme.
+//
+//  This source code is licensed under the MIT-style license found in the
+//  LICENSE file in the root directory of this source tree.
 //
 
 #import <Foundation/Foundation.h>
@@ -35,7 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  映射到的类
  */
-@property(nonatomic , assign, readonly)Class mapperCls;
+@property(nonatomic , assign)Class mapperCls;
 
 /**
  setter
