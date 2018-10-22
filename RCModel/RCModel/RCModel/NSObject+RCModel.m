@@ -70,6 +70,48 @@ static void SetModelWithDictionary(const void *key , const void *value , void *c
 }
 
 /**
+ 将 json 转化为 model（可识别 NSData ， NSString ， NSDictionary）
+
+ @param json json 数据
+ @return 转化后的 model
+ */
++ (instancetype)modelWithJson:(id)json{
+    NSDictionary *dic = [self dictionaryWithJson:json];
+    if (dic) {
+        return [self modelWithDictionary:dic];
+    } else {
+        return nil;
+    }
+}
+
+/**
+ 将 json 转化为 dic
+
+ @param json json
+ @return dic
+ */
++ (NSDictionary *)dictionaryWithJson:(id)json{
+    if (!json || json == (id)kCFNull) {
+        return nil;
+    }
+    NSDictionary *dic = nil;
+    NSData *jsonData = nil;
+    if ([json isKindOfClass:[NSDictionary class]]) {
+        dic = json;
+    } else if ([json isKindOfClass:[NSData class]]){
+        jsonData = json;
+    } else if ([json isKindOfClass:[NSString class]]){
+        jsonData = [(NSString *)json dataUsingEncoding:NSUTF8StringEncoding];
+    }
+    if (jsonData) {
+        dic = [NSJSONSerialization JSONObjectWithData:jsonData options:kNilOptions error:nil];
+        if (!dic) {
+            dic = nil;
+        }
+    }
+    return dic;
+}
+/**
  将字典动态转化为数据模型
 
  @param dic 要转化的字典

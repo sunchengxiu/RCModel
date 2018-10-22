@@ -18,13 +18,14 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface NSObject (RCModel)
+
 /**
- json -> model
+ 将 json 转化为 model（可识别 NSData ， NSString ， NSDictionary）
  
- @param dic 要转化的字典
- @return 数据模型
+ @param json json 数据
+ @return 转化后的 model
  */
-+ (instancetype)modelWithDictionary:(NSDictionary *)dic;
++ (instancetype)modelWithJson:(id)json;
 @end
 
 NS_ASSUME_NONNULL_END
