@@ -48,18 +48,21 @@
 @end
 @implementation RCModelMeta
 - (instancetype)initWithClass:(Class)cls{
+    // 创建类信息
     RCClassInfo *classInfo = [RCClassInfo classInfoWithClass:cls];
     if (!classInfo) {
         return nil;
     }
     self = [super init];
     NSSet *blackSet = nil;
+    // 自定义黑名单，不需要解析的属性
     if ([cls respondsToSelector:@selector(modelPropertyBlacklist)]) {
         NSArray *arr = [(id<RCModelProtocol>)cls modelPropertyBlacklist];
         if (arr) {
             blackSet = [NSSet setWithArray:arr];
         }
     }
+    // 白名单
     NSSet *whiteSet = nil;
     if ([cls respondsToSelector:@selector(modelPropertyWhitelist)]) {
         NSArray *arr = [(id<RCModelProtocol>)cls modelPropertyWhitelist];
@@ -68,6 +71,12 @@
         }
     }
     // 自定义映射
+    /*
+     {
+         @"user":RCUser.class,
+         @"address",@"RCAddress"
+     }
+     */
     NSDictionary *customMapper;
     if ([cls respondsToSelector:@selector(modelCustomPropertyMapClass)]) {
         customMapper = [(id<RCModelProtocol>)cls modelCustomPropertyMapClass];

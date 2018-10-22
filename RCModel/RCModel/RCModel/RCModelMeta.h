@@ -52,12 +52,12 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  keypath arr
  */
-@property(nonatomic , strong)NSMutableArray *keyPathsArr;
+@property(nonatomic , strong , readonly)NSMutableArray *keyPathsArr;
 
 /**
  muti keypath arr
  */
-@property(nonatomic , strong)NSMutableArray *mutiKeyPathArr;
+@property(nonatomic , strong ,readonly)NSMutableArray *mutiKeyPathArr;
 
 /**
  初始化 modelMeta 类

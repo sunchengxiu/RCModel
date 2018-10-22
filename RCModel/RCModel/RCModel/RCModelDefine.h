@@ -141,7 +141,7 @@ typedef NS_OPTIONS(NSUInteger, RCEncodingType) {
     RCEncodingTypeCArray    = 22 ,
     
     /**
-     方法编码
+     方法编码修饰符
      */
     RCEncodingTypeQualifierMask = 0xFF00 ,
     

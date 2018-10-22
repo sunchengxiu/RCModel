@@ -62,23 +62,6 @@ id RCValueForKeyPaths(__unsafe_unretained NSDictionary *dic ,__unsafe_unretained
  @param propertyMeta propertyMeta
  */
 void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretained id value , __unsafe_unretained RCModelPropertyMeta *propertyMeta);
-//
-///**
-// 将 NSNumber 已元基本数据类型形式发送赋值
-//
-// @param model model
-// @param number NSNumber
-// @param propertyMeta propertyMeta
-// */
-//void RCModelSetNumberValueForProperty(__unsafe_unretained id model , __unsafe_unretained NSNumber *number , __unsafe_unretained RCModelPropertyMeta *propertyMeta);
-//
-///**
-// 将 value 转化为 NSNumber
-//
-// @param value 要转化的 value
-// @return 转化后的 NSNumber 或 nil
-// */
-//NSNumber *RCNSNumberCreateFromID(__unsafe_unretained id value);
 @end
 
 NS_ASSUME_NONNULL_END

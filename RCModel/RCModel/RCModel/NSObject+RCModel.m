@@ -42,6 +42,7 @@ static void SetModelWithPropertyMeta(const void *propertyMeta , void * context){
         return;
     }
     id value = nil;
+    // 存在自定义属性映射的，需要重新获取并赋值
     if (meta.mapToKeyPath) {
         value = RCValueForKeyPaths(dic, meta.mapToKeyPath);
     } else if(meta.mapToArray){
@@ -63,9 +64,9 @@ static void SetModelWithDictionary(const void *key , const void *value , void *c
         if (propertyMeta.setter) {
             RCModelSetValueForProperty(model, (__bridge __unsafe_unretained id)value, propertyMeta);
         }
+        // 如果存在 json 中的一个 key ，对应 model 中的多个属性的时候，之前的属性元类处理方式是将这些一对多以链表的形式存储，保证不拉下每一个，所以这里要便利它的 next 指针，找出所有的model。
         propertyMeta = propertyMeta.next;
     }
-    
 }
 
 /**
@@ -113,8 +114,10 @@ static void SetModelWithDictionary(const void *key , const void *value , void *c
     // 判断模型的属性数量与json的键值对数量的对应关系,这样可以减少循环方法调用次数
     if (meta.keyMapCount >= CFDictionaryGetCount((CFDictionaryRef)dic)) {
         // 如果存在模型中多个属性对应json的一个属性的时候
-        // s根据字典给模型赋值
+        // 根据字典给模型赋值
+        // 这里只是最基本的赋值，没有处理映射的情况
         CFDictionaryApplyFunction((CFDictionaryRef)dic, SetModelWithDictionary, &context);
+        // 这里主要是为了减少遍历次数，只遍历特殊的自定义映射
         if (meta.keyPathsArr) {
             CFArrayApplyFunction((CFArrayRef)meta.keyPathsArr, CFRangeMake(0, CFArrayGetCount((CFArrayRef)meta.keyPathsArr)), SetModelWithPropertyMeta, &context);
         } else if (meta.mutiKeyPathArr){
@@ -126,6 +129,7 @@ static void SetModelWithDictionary(const void *key , const void *value , void *c
     }
     // 模型转换检测
     if (meta.isHasCustomTransformFromDic) {
+        // 处理上述所有自动转换无法完成的情况。
         return [(id<RCModelProtocol>)self modelCustomTransformFromDictionary:dic];
     }
     return YES;

@@ -20,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  获取编码类型
  
- @discussion See also:
+ @discussion Apple doc:
  https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtTypeEncodings.html
  https://developer.apple.com/library/mac/documentation/Cocoa/Conceptual/ObjCRuntimeGuide/Articles/ocrtPropertyIntrospection.html
  
@@ -231,7 +231,7 @@ RCEncodingType RCGetEncodingType(const char *encodingType);
 @property(nullable , nonatomic , strong , readonly)RCClassInfo *superClsInfo;
 
 /**
- 如果一个类发生了更改，调用这个类来刷新类信息
+ 如果一个类发生了更改，需要调用这个类来刷新类信息
  */
 - (void)setNeedUpdate;
 

@@ -351,21 +351,35 @@ RCEncodingType RCGetEncodingType(const char *encodingType){
         return nil;
     }
     self = [super init];
+    // 类名
     _name = NSStringFromClass(cls);
+    // 当前类
     _cls = cls;
+    // 父类
     _superCls = class_getSuperclass(cls);
+    // 当前类是否是元类
     _isMeta = class_isMetaClass(cls);
     if (!_metaCls) {
+        // 获取元类
         _metaCls = objc_getMetaClass(class_getName(cls));
     }
+    // 更新类信息
     [self _update];
+    // 父类信息
     _superClsInfo = [self.class classInfoWithClass:_superCls];
     return self;
     
 }
+
+/**
+ 是否需要更新类信息
+
+ @return 是否需要更新类信息
+ */
 -(BOOL)needUpdate{
     return _needUpdate;
 }
+// 设置标识，需要更细类信息
 -(void)setNeedUpdate{
     _needUpdate = YES;
 }
@@ -409,6 +423,7 @@ RCEncodingType RCGetEncodingType(const char *encodingType){
     _methodList = nil;
     Class cls = self.cls;
     unsigned int methodCount;
+    // 方法列表
     Method *methodList = class_copyMethodList(cls, &methodCount);
     if (methodList) {
         NSMutableDictionary *dic = [NSMutableDictionary dictionary];
@@ -423,6 +438,7 @@ RCEncodingType RCGetEncodingType(const char *encodingType){
         free(methodList);
     }
     unsigned int propertyCount;
+    // property list
     objc_property_t *propertyList = class_copyPropertyList(cls, &propertyCount);
     if (propertyList) {
         NSMutableDictionary *dic = [NSMutableDictionary dictionary];
@@ -437,7 +453,7 @@ RCEncodingType RCGetEncodingType(const char *encodingType){
         free(propertyList);
     }
     
-    
+    // ivar 列表
     unsigned int ivarCount;
     Ivar *ivarList = class_copyIvarList(cls, &ivarCount);
     if (ivarList) {

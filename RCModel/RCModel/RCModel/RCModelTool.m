@@ -58,6 +58,7 @@ BOOL RCEncodingTypeIsCNumber(RCEncodingType type) {
     }
 }
 id RCValueForKeyPaths(__unsafe_unretained NSDictionary *dic ,__unsafe_unretained NSArray *keyPaths){
+    // 如 "user.name"
     id value = nil;
     NSUInteger max = keyPaths.count;
     for (NSInteger i = 0 ; i < keyPaths.count; i ++) {
@@ -127,10 +128,13 @@ static force_inline  NSNumber *RCNSNumberCreateFromID(__unsafe_unretained id val
     if (!value || value == (id)kCFNull) {
         return nil;
     }
+    // 如果是 NSNumber 类型，那么就自动返回，无需转化
     if ([value isKindOfClass:[NSNumber class]]) {
         return value;
     }
+    // 如果传入了一个字符串，需要根据字符串排除一些指定的格式
     if ([value isKindOfClass:[NSString class]]) {
+        // 如果是上面列举的那几种 value
         NSNumber *number = dic[value];
         if (number != nil) {
             if (number == (id)kCFNull) {
@@ -261,6 +265,7 @@ static force_inline NSDate *RCNSDateFromString(__unsafe_unretained NSString *str
     });
     if (!string) return nil;
     if (string.length > kParserNum) return nil;
+    // 不同的格式化类型，就对应不同的字符串长度，根据字符串长度去指定的缓存数组中c找出扎个 parser ， 然后进行日期的格式化
     RCNSDateParseBlock parser = blocks[string.length];
     if (!parser) return nil;
     return parser(string);
@@ -382,6 +387,7 @@ void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretain
                 case RCEncodingTypeNSMutableString:
                 {
                     BOOL muti = propertyMeta.nsType == RCEncodingTypeNSMutableString;
+                    // 处理运行时传入多种数据类型的情况
                     if ([value isKindOfClass:[NSString class]]) {
                         ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter , (!muti ? (id)value : (id)(((NSString *)value).mutableCopy)));
                     } else if ([value isKindOfClass:[NSNumber class]]){
@@ -425,10 +431,17 @@ void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretain
                 {
                     BOOL muti = propertyMeta.nsType == RCEncodingTypeNSMutableData;
                     if ([value isKindOfClass:[NSData class]]) {
-                        ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,value);
-                    } else if ([value isKindOfClass:[NSString class]]){
+                        if (propertyMeta.nsType == RCEncodingTypeNSData) {
+                            ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,value);
+                        } else {
+                            ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,((NSMutableData *)value).mutableCopy);
+                        }
+                    }else if ([value isKindOfClass:[NSString class]]){
                         NSData *data = [(NSString *)value dataUsingEncoding:NSUTF8StringEncoding];
-                        ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,!muti ? data : data.mutableCopy);
+                        if (propertyMeta.nsType == RCEncodingTypeNSMutableData) {
+                            data = data.mutableCopy;
+                        }
+                        ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,!muti ? data : data);
                     }
                 }
                     break;
@@ -472,9 +485,11 @@ void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretain
                             // 如数组里面放的泛型
                             NSMutableArray *objectArr = [NSMutableArray array];
                             for (id object in valueArr) {
+                                // 数组里面放的泛型，直接添加就可以
                                 if ([object isKindOfClass:propertyMeta.mapperCls]) {
                                     [objectArr addObject:object];
                                 } else if([object isKindOfClass:[NSDictionary class]]){
+                                    // 如果是字典，存在自定义映射，那么根据自定义映射，去再次进行 json -> model 的转换
                                     Class newClass = propertyMeta.mapperCls;
                                     if (propertyMeta.isHasCustomMapperDictionary) {
                                         newClass = [newClass modelCustomClassForDictionary:object];
@@ -489,19 +504,20 @@ void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretain
                                     [objectArr addObject:newObject];
                                 }
                             }
+                            // 模型嵌套转化完毕，进行消息发送
                             ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,objectArr);
                         }
                     } else {
                         BOOL muti = propertyMeta.nsType == RCEncodingTypeNSMutableArray;
                         if ([value isKindOfClass:[NSArray class]]) {
                             ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,!muti ? value : ((NSArray *)value).mutableCopy);
+                            
                         } else if ([value isKindOfClass:[NSSet class]]){
                             ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,!muti ? [((NSSet *)value) allObjects] : ((NSSet *)value).allObjects.mutableCopy);
                         }
                     }
                 }
                     break;
-                    
                 case RCEncodingTypeNSDictionary:
                 case RCEncodingTypeNSMutableDictionary:
                 {
@@ -524,8 +540,8 @@ void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretain
                                      mdic[key] = obj;
                                 }
                             }
-                            ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,mdic);
                         }];
+                        ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,mdic);
                         
                     } else {
                         BOOL muti = propertyMeta.nsType == RCEncodingTypeNSMutableDictionary;
