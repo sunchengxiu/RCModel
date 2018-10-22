@@ -19,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSObject (RCModel)
 /**
- 将字典动态转化为数据模型
+ json -> model
  
  @param dic 要转化的字典
  @return 数据模型

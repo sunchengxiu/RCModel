@@ -352,7 +352,20 @@ static force_inline  void RCModelSetNumberValueForProperty(__unsafe_unretained i
             break;
     }
 }
-static force_inline  void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretained id value , __unsafe_unretained RCModelPropertyMeta *propertyMeta){
+static force_inline Class RCNSBlockClass(){
+    static dispatch_once_t onceToken;
+    static Class cls;
+    dispatch_once(&onceToken, ^{
+        void (^block)(void)= ^{};
+        Class cls = ((NSObject *)block).class;
+        while (class_getSuperclass(cls) != [NSObject class]) {
+            cls = class_getSuperclass(cls);
+        }
+        
+    });
+    return cls;
+}
+void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretained id value , __unsafe_unretained RCModelPropertyMeta *propertyMeta){
     if (propertyMeta.isCNumber) {
         // 将基本数据类型转化为 NSNumber
         NSNumber *number = RCNSNumberCreateFromID(value);
@@ -561,7 +574,111 @@ static force_inline  void RCModelSetValueForProperty(__unsafe_unretained id mode
             }
         }
     } else {
-        
+        BOOL isNULL = value == (id)kCFNull;
+        switch (propertyMeta.encodingType & RCEncodingTypeMask) {
+            case RCEncodingTypeObject:
+            {
+                Class cls = propertyMeta.mapperCls?:propertyMeta.cls;
+                if (isNULL) {
+                    ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,(id)nil);
+                } else if ([value isKindOfClass:cls] || !value){
+                    ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,value);
+                } else if ([value isKindOfClass:[NSDictionary class]]){
+                    NSObject *one = nil;
+                    if (propertyMeta.getter) {
+                        one = ((id (*) (id , SEL ))objc_msgSend)((id)model , propertyMeta.getter );
+                    }
+                    if (one) {
+                        [one modelSetWithDictionary:value];
+                    } else {
+                        if (propertyMeta.isHasCustomMapperDictionary) {
+                            cls = [cls modelCustomClassForDictionary:value] ?: cls;
+                        }
+                        one = [cls new];
+                        [one modelSetWithDictionary:value];
+                        ((void (*) (id , SEL ,id))objc_msgSend)((id)model , propertyMeta.setter , one );
+                    }
+                }
+            }
+                break;
+            case RCEncodingTypeClass:
+            {
+                if (isNULL) {
+                    ((void (*) (id , SEL ,Class))objc_msgSend)((id)model , propertyMeta.setter , (Class)NULL );
+
+                } else {
+                    Class cls = nil;
+                    if ([value isKindOfClass:[NSString class]]) {
+                        cls = NSClassFromString(value);
+                        if (cls) {
+                            ((void (*) (id , SEL ,Class))objc_msgSend)((id)model , propertyMeta.setter , cls );
+
+                        }
+                    } else {
+                        cls = object_getClass(value);
+                        if (cls) {
+                            if (class_isMetaClass( cls )) {
+                                ((void (*) (id , SEL ,Class))objc_msgSend)((id)model , propertyMeta.setter , (Class)value );
+                            }
+                        }
+                    }
+                }
+            }
+                break;
+            case RCEncodingTypeSEL:{
+                if (isNULL) {
+                    ((void (*) (id , SEL ,SEL))objc_msgSend)((id)model , propertyMeta.setter , (SEL)NULL );
+                } else {
+                    if ([value isKindOfClass:[NSString class]]) {
+                        SEL sel = NSSelectorFromString(value);
+                        if (sel) {
+                            ((void (*) (id , SEL ,SEL))objc_msgSend)((id)model , propertyMeta.setter , (SEL)sel );
+                        }
+                    } else {
+                    
+                    }
+                }
+            }
+                break;
+            case RCEncodingTypeBlock:{
+                if (isNULL) {
+                    ((void (*) (id , SEL ,void (^)(void)))objc_msgSend)((id)model , propertyMeta.setter , (void (^)(void))NULL);
+                } else if ([value isKindOfClass:RCNSBlockClass()]){
+                    ((void (*) (id , SEL ,void (^)(void)))objc_msgSend)((id)model , propertyMeta.setter , (void (^)(void))value);
+                }
+            }
+                break;
+                // C 类型 用 NSValue 包装
+            case RCEncodingTypeCArray:
+            case RCEncodingTypeUnion:
+            case RCEncodingTypeStruct:
+            {
+                if ([value isKindOfClass:[NSValue class]]) {
+                    const char *type = ((NSValue *)value).objCType;
+                    const char *typeEncoding = propertyMeta.propertyInfo.typeEncoding.UTF8String;
+                    if (type && typeEncoding && strcmp(type, typeEncoding) == 0) {
+                        // 结构体使用 KVC 赋值
+                        [model setValue:(NSValue *)value forKey:propertyMeta.name];
+                    }
+                }
+            }
+                break;
+                // 指针类型
+            case RCEncodingTypeCString:
+            case RCEncodingTypePointer:
+            {
+                if (isNULL) {
+                    ((void (*) (id , SEL ,void *))objc_msgSend)((id)model , propertyMeta.setter , (void *)NULL);
+                } else if ([value isKindOfClass:[NSValue class]]){
+//                    [NSValue valueWithPointer:(nullable const void *)] , 要传入 （void *），需要转化成这个类型，所以类型就是 ^v
+                    NSValue *nsvalue = (NSValue *)value;
+                    if (nsvalue &&nsvalue.objCType && strcmp(nsvalue.objCType, "^v") == 0) {
+                        ((void (*) (id , SEL ,void *))objc_msgSend)((id)model , propertyMeta.setter , nsvalue.pointerValue);
+                    }
+                }
+            }
+            default:break;
+        }
     }
 }
 @end

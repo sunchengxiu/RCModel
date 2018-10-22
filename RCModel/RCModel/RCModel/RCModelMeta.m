@@ -23,9 +23,8 @@
 {
     RCClassInfo *_classInfo;
     RCEncodingNSType _nsType;
-    NSMutableArray *_keyPathsArr;
-    NSMutableArray *_mutiKeyPathArr;
-    NSMutableDictionary *_mapper;
+   
+    
 }
 
 /**
@@ -37,6 +36,10 @@
  自定义属性映射
  */
 @property(nonatomic , assign )BOOL isCustomClassFromDictionary;
+/**
+ 所有的映射
+ */
+@property(nonatomic , copy )NSMutableDictionary *mapper; ;
 
 /**
  映射数量
@@ -214,7 +217,10 @@
     _classInfo = classInfo;
     _nsType = RCClassGetNSType(cls);
     _keyMapCount = _allPropertyMetaArrs.count;
+    // 是否实现某些协议
     _isCustomClassFromDictionary = [cls respondsToSelector:@selector(modelCustomClassForDictionary:)];
+    _isHasCustomTransformFromDic = [cls instanceMethodForSelector:@selector(modelCustomTransformFromDictionary:)];
+    _isHasCustomTransformToDic = [cls instanceMethodSignatureForSelector:@selector(modelCustomTransformToDictionary:)];
     return nil;
 }
 + (instancetype)metaWithClass:(Class)cls{
@@ -233,6 +239,7 @@
     RCModelMeta *meta = CFDictionaryGetValue(cache, (const void *)cls);
     dispatch_semaphore_signal(lock);
     if (!meta || [meta->_classInfo needUpdate]) {
+        // 创建一个模型描述类
         meta = [[RCModelMeta alloc] initWithClass:cls];
         if (meta) {
             dispatch_semaphore_wait(lock, DISPATCH_TIME_FOREVER);

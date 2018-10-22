@@ -30,9 +30,34 @@ NS_ASSUME_NONNULL_BEGIN
 @property(nonatomic , assign , readonly)BOOL isCustomClassFromDictionary;
 
 /**
+ json - > model 过程中，是否有实现自定义检测类，来实现 json -> model 无法实现的需求
+ */
+@property(nonatomic , assign, readonly) BOOL isHasCustomTransformFromDic;
+
+/**
+ model -> json 过程中，是否有实现自定义检测类，来实现 model -> json 无法实现的需求
+ */
+@property(nonatomic , assign, readonly) BOOL isHasCustomTransformToDic;
+
+/**
  映射数量
  */
 @property(nonatomic , assign , readonly)NSUInteger keyMapCount;
+
+/**
+ 所有的映射
+ */
+@property(nonatomic , copy , readonly)NSMutableDictionary *mapper;
+
+/**
+ keypath arr
+ */
+@property(nonatomic , strong)NSMutableArray *keyPathsArr;
+
+/**
+ muti keypath arr
+ */
+@property(nonatomic , strong)NSMutableArray *mutiKeyPathArr;
 
 /**
  初始化 modelMeta 类

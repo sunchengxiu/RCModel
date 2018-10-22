@@ -2,7 +2,7 @@
 //  RCModelTool.h
 //  RCModel
 //
-//  Copyed and modified by 孙承秀 on 2018/8/26.
+//  Copyed and modified  by 孙承秀 on 2018/8/26.
 //  Thank you for YY
 //  YYKit <https://github.com/ibireme/YYKit>
 //
@@ -53,15 +53,15 @@ id RCValueForMutiKeys(__unsafe_unretained NSDictionary *dic , __unsafe_unretaine
  @return 解析成功的 value
  */
 id RCValueForKeyPaths(__unsafe_unretained NSDictionary *dic ,__unsafe_unretained NSArray *keyPaths);
-//
-///**
-// json -> model 将 property 赋值
-//
-// @param model model
-// @param value 设置的 value
-// @param propertyMeta propertyMeta
-// */
-//void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretained id value , __unsafe_unretained RCModelPropertyMeta *propertyMeta);
+
+/**
+ json -> model 将 property 赋值
+
+ @param model model
+ @param value 设置的 value
+ @param propertyMeta propertyMeta
+ */
+void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretained id value , __unsafe_unretained RCModelPropertyMeta *propertyMeta);
 //
 ///**
 // 将 NSNumber 已元基本数据类型形式发送赋值

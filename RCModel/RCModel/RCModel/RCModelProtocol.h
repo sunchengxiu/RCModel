@@ -102,6 +102,28 @@ NS_ASSUME_NONNULL_BEGIN
  @return A custom mapper for properties.
  */
 + (nullable NSDictionary<NSString *, id> *)modelCustomPropertyMapper;
+
+/**
+ 可以使用此方法验证属性的转换是否正确，也可以使用i此方法完成一些自动转换没有办法完成的工作
+ 
+ @discussion 此方法将在 `modelWithDictionary` 等之后调用，如果返回 NO ， 将忽略此模型
+ 
+ @param dic  json->model 中使用的 json
+ 
+ @return 如果模型可用请返回 YES， 否则返回 NO。
+ */
+- (BOOL)modelCustomTransformFromDictionary:(NSDictionary *)dic;
+
+/**
+ 如果默认的 model -> json ， 满足不了需要，可使用此方法做一些额外的处理，可以使用此方法验证模型是否有效，返回 YES 或 NO 来证明。
+ 
+ @discussion 此方法将在 `-modelToJSONString` 之后来调用
+ 
+ @param dic  model
+ 
+ @return 返回 YES 或者 NO 来表示是否可用
+ */
+- (BOOL)modelCustomTransformToDictionary:(NSMutableDictionary *)dic;
 @end
 
 NS_ASSUME_NONNULL_END
