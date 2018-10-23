@@ -48,7 +48,7 @@ static void SetModelWithPropertyMeta(const void *propertyMeta , void * context){
     } else if(meta.mapToArray){
         value = RCValueForMutiKeys(dic, meta.mapToArray);
     } else {
-        value = [dic objectForKey:dic[meta.mapToKey]];
+        value = [dic objectForKey:meta.mapToKey];
     }
     if (value) {
         id model = (__bridge id)_context->model;
@@ -149,10 +149,10 @@ static void SetModelWithDictionary(const void *key , const void *value , void *c
     if (meta.keyMapCount == 0) {
         return NO;
     }
-    RCModelSetContext *context = {0};
-    context->model = (__bridge void *)self;
-    context->modelMeta = (__bridge void *)meta;
-    context->dic = (__bridge void *)dic;
+    RCModelSetContext context = {0};
+    context.model = (__bridge void *)self;
+    context.modelMeta = (__bridge void *)meta;
+    context.dic = (__bridge void *)dic;
     // 判断模型的属性数量与json的键值对数量的对应关系,这样可以减少循环方法调用次数
     if (meta.keyMapCount >= CFDictionaryGetCount((CFDictionaryRef)dic)) {
         // 如果存在模型中多个属性对应json的一个属性的时候

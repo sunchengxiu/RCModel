@@ -112,10 +112,10 @@
             if (!propertyInfo.name) {
                 continue;
             }
-            if ([blackSet containsObject:propertyInfo.name]) {
+            if (blackSet !=nil && [blackSet containsObject:propertyInfo.name]) {
                 continue;
             }
-            if (![whiteSet containsObject:propertyInfo.name]) {
+            if (whiteSet != nil && ![whiteSet containsObject:propertyInfo.name]) {
                 continue;
             }
             RCModelPropertyMeta *propertyMeta = [RCModelPropertyMeta propertyMetaWithClassInfo:currentClassInfo propertyInfo:propertyInfo mapper:customMapper[propertyInfo.name]];
@@ -130,6 +130,7 @@
             }
             allPropertys[propertyMeta.name] = propertyMeta;
         }
+        currentClassInfo = currentClassInfo.superClsInfo;
     }
     _allPropertyMetaArrs = allPropertys.allValues.copy;
     NSMutableDictionary *mapper = [NSMutableDictionary dictionary];
@@ -142,6 +143,9 @@
         [customMapper enumerateKeysAndObjectsUsingBlock:^(NSString *  _Nonnull propertyName, NSString *  _Nonnull map, BOOL * _Nonnull stop) {
             // 去掉特殊映射
             RCModelPropertyMeta *propertyMeta = allPropertys[propertyName];
+            if (!propertyMeta) {
+                return ;
+            }
             if (propertyMeta != nil) {
                 [allPropertys removeObjectForKey:propertyName];
             }
@@ -161,9 +165,11 @@
                         break;
                     }
                 }
-                if (keyPath.count > 0) {
+                if (keyPath.count > 1) {
                     propertyMeta.mapToKeyPath = keyPath;
-                    [keyPaths addObject:propertyMeta];
+                    if (propertyMeta != nil) {
+                        [keyPaths addObject:propertyMeta];
+                    }
                 }
                 // 多个属性映射同一个可以
                 /*
@@ -201,7 +207,9 @@
                     return;
                 }
                 propertyMeta.mapToArray = keyArray;
-                [mutiKeyPaths addObject:propertyMeta];
+                if (propertyMeta != nil) {
+                 [mutiKeyPaths addObject:propertyMeta];
+                }
                 propertyMeta.next = mapper[map]?:nil;
                 mapper[map] = propertyMeta;
             }
@@ -228,9 +236,9 @@
     _keyMapCount = _allPropertyMetaArrs.count;
     // 是否实现某些协议
     _isCustomClassFromDictionary = [cls respondsToSelector:@selector(modelCustomClassForDictionary:)];
-    _isHasCustomTransformFromDic = [cls instanceMethodForSelector:@selector(modelCustomTransformFromDictionary:)];
-    _isHasCustomTransformToDic = [cls instanceMethodSignatureForSelector:@selector(modelCustomTransformToDictionary:)];
-    return nil;
+    _isHasCustomTransformFromDic = [cls instancesRespondToSelector:@selector(modelCustomTransformFromDictionary:)];
+    _isHasCustomTransformToDic = [cls instancesRespondToSelector:@selector(modelCustomTransformToDictionary:)];
+    return self;
 }
 + (instancetype)metaWithClass:(Class)cls{
     if (!cls) {

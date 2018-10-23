@@ -43,7 +43,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  @return 自定义模型映射
  */
-+ (nullable NSDictionary <NSString * , NSString *>*)modelCustomPropertyMapClass;
++ (nullable NSDictionary <NSString * , id>*)modelCustomPropertyMapClass;
 
 /**
  json->model 过程中，用该方法自定义字典中属性对应的自定义类

@@ -103,7 +103,7 @@
     // 是否存在自定义映射字典
     if (mapper) {
         meta.isHasCustomMapperDictionary = [mapper respondsToSelector:@selector(modelCustomClassForDictionary:)];
-    } else if(meta.cls ) {
+    } else if(meta.cls && meta.nsType == RCEncodingTypeUnknow) {
         meta.isHasCustomMapperDictionary = [meta.cls respondsToSelector:@selector(modelCustomClassForDictionary:)];
     }
     // 判断结构体是否支持归档,下面这几种才支持

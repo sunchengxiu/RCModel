@@ -263,6 +263,9 @@
              @"sinceID" : @"since_id",
              @"nextCursor" : @"next_cursor"};
 }
++ (nullable NSDictionary <NSString * , id>*)modelCustomPropertyMapClass;{
+    return @{@"statuses" : [WBStatus class]};
+}
 + (NSDictionary *)modelContainerPropertyGenericClass {
     return @{@"statuses" : [WBStatus class]};
 }
