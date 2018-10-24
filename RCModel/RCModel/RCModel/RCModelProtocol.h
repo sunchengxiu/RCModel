@@ -2,7 +2,7 @@
 //  RCModelProtocol.h
 //  RCModel
 //
-//  Copyed and modified by 孙承秀 on 2018/8/26.
+//  Copyed and modified by 孙承秀 on 2018/10/15.
 //  Thank you for YY
 //  YYKit <https://github.com/ibireme/YYKit>
 //
