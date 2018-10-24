@@ -126,10 +126,10 @@
 				E875A6792175C791003F9B52 /* RCModelMeta.m */,
 				E875A67D2175EFB5003F9B52 /* RCModelPropertyMeta.h */,
 				E875A67E2175EFB5003F9B52 /* RCModelPropertyMeta.m */,
-				E84D498B2132884C0078B0D3 /* NSObject+RCModel.h */,
-				E84D498C2132884C0078B0D3 /* NSObject+RCModel.m */,
 				E875A6852176D5D0003F9B52 /* RCModelTool.h */,
 				E875A6862176D5D0003F9B52 /* RCModelTool.m */,
+				E84D498B2132884C0078B0D3 /* NSObject+RCModel.h */,
+				E84D498C2132884C0078B0D3 /* NSObject+RCModel.m */,
 			);
 			path = RCModel;
 			sourceTree = "<group>";
