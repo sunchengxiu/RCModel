@@ -62,6 +62,14 @@ id RCValueForKeyPaths(__unsafe_unretained NSDictionary *dic ,__unsafe_unretained
  @param propertyMeta propertyMeta
  */
 void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretained id value , __unsafe_unretained RCModelPropertyMeta *propertyMeta);
+
+/**
+ 去递归解析模型
+ 
+ @param model 需要解析的模型
+ @return 解析好的数据
+ */
+id ModelToJSONObjectRecursive(NSObject *model);
 @end
 
 NS_ASSUME_NONNULL_END

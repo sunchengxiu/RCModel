@@ -16,11 +16,36 @@
 #import <OBJC/message.h>
 #import "NSObject+RCModel.h"
 #import "RCModelProtocol.h"
+#import "RCModelMeta.h"
 #define force_inline __inline__ __attribute__((always_inline))
 @interface NSObject()
 - (BOOL)modelSetWithDictionary:(NSDictionary *)dic;
 @end
 @implementation RCModelFormater
+static force_inline NSNumber *ModelCreateNumberFromProperty(__unsafe_unretained id model,
+                                                            __unsafe_unretained RCModelPropertyMeta *meta) {
+    // 通过get方法获取值
+//    switch (<#expression#>) {
+//        case <#constant#>:
+//            <#statements#>
+//            break;
+//            
+//        default:
+//            break;
+//    }
+    
+}
+static force_inline NSDateFormatter *RCISODateFormatter() {
+    static NSDateFormatter *formatter = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        formatter = [[NSDateFormatter alloc] init];
+        formatter.locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_US_POSIX"];
+        formatter.dateFormat = @"yyyy-MM-dd'T'HH:mm:ssZ";
+    });
+    return formatter;
+}
+
 RCEncodingNSType RCClassGetNSType(Class cls) {
     if (!cls) return RCEncodingTypeNSUnknown;
     if ([cls isSubclassOfClass:[NSMutableString class]]) return RCEncodingTypeNSMutableString;
@@ -704,5 +729,108 @@ void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretain
             default:break;
         }
     }
+}
+
+/**
+ 去递归解析模型
+
+ @param model 需要解析的模型
+ @return 解析好的数据
+ */
+id ModelToJSONObjectRecursive(NSObject *model) {
+    if (!model || model == (id)kCFNull) {
+        return model;
+    }
+    if ([model isKindOfClass:[NSString class]]) {
+        return model;
+    }
+    if ([model isKindOfClass:[NSNumber class]]) {
+        return model;
+    }
+    if ([model isKindOfClass:[NSDictionary class]]) {
+        // 苹果规定 All objects are NSString, NSNumber, NSArray, NSDictionary, or NSNull
+        if ([NSJSONSerialization isValidJSONObject:model]) {
+            return model;
+        }
+        NSMutableDictionary *mdic = [NSMutableDictionary dictionary];
+        [((NSDictionary *)model) enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+            if (!key) {
+                return ;
+            }
+            id jsonObject = ModelToJSONObjectRecursive(obj);
+            if (jsonObject) {
+                mdic[key] = jsonObject;
+            }
+        }];
+        return mdic;
+    }
+    if ([model isKindOfClass:[NSArray class]]) {
+        if ([NSJSONSerialization isValidJSONObject:model]) {
+            return model;
+        }
+        NSMutableArray *arr = [NSMutableArray array];
+        [((NSArray *)model) enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if (!obj) {
+                return ;
+            }
+            if ([obj isKindOfClass:[NSString class]] || [obj isKindOfClass:[NSNumber class]]) {
+                [arr addObject:obj];
+            } else {
+                id jsonObject = ModelToJSONObjectRecursive(obj);
+                if (jsonObject && jsonObject != (id)kCFNull) {
+                    [arr addObject:jsonObject];
+                }
+            }
+        }];
+        return arr;
+    }
+    if ([model isKindOfClass:[NSSet class]]) {
+        NSArray *arr = ((NSSet *)model).allObjects;
+        if ([NSJSONSerialization isValidJSONObject:arr]) {
+            return arr;
+        }
+        NSMutableArray *marr = [NSMutableArray array];
+        [arr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+            if ([obj isKindOfClass:[NSString class]] || [obj isKindOfClass:[NSNumber class]]) {
+                [marr addObject:obj];
+            } else {
+                id jsonObject = ModelToJSONObjectRecursive(obj);
+                if (jsonObject && jsonObject != (id)kCFNull) {
+                    [marr addObject:jsonObject];
+                }
+            }
+        }];
+        return marr;
+    }
+    if ([model isKindOfClass:[NSData  class]]) {
+        return nil;
+    }
+    if ([model isKindOfClass:[NSURL class]]) {
+        return ((NSURL *)model).absoluteString;
+    }
+    if ([model isKindOfClass:[NSAttributedString class]]) {
+        return ((NSAttributedString *)model).string;
+    }
+    if ([model isKindOfClass:[NSDate class]]) {
+        return [RCISODateFormatter() stringFromDate:(id)model];
+    }
+    RCModelMeta *modelMeta = [RCModelMeta metaWithClass:[model class] ];
+    if (!modelMeta || modelMeta.keyMapCount <= 0) {
+        return nil;
+    }
+    NSMutableDictionary *result = [NSMutableDictionary dictionary];
+    __unsafe_unretained NSMutableDictionary *dic = result;
+    [modelMeta.mapper enumerateKeysAndObjectsUsingBlock:^(NSString *  _Nonnull key, RCModelPropertyMeta *  _Nonnull obj, BOOL * _Nonnull stop) {
+        if (!key) {
+            return ;
+        }
+        // 需要通过get方法获取value，所以必须要有getter
+        if (!obj.getter) {
+            return;
+        }
+        
+    }];
+    
+    return nil;
 }
 @end
