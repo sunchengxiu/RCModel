@@ -11,6 +11,7 @@
 #import <objc/runtime.h>
 #import "NSObject+RCModel.h"
 #import "WBModel.h"
+#import "T1Model.h"
 @interface ViewController ()
 
 /**
@@ -26,8 +27,10 @@
     
 //    for (int i = 0; i <= 7; i++) {
         NSData *data = [NSData dataWithContentsOfFile:@"/Users/sunchengxiu/Desktop/RCKit/RCModel/RCModel/RCModel/weibo_0.json"];
-                WBTimelineItem *item = [WBTimelineItem modelWithJson:data];
-        NSLog(@"%@",item);
+//        WBTimelineItem *item = [WBTimelineItem modelWithJson:data];
+    NSData *data1 = [NSData dataWithContentsOfFile:@"/Users/sunchengxiu/Desktop/RCKit/RCModel/RCModel/RCModel/twitter_0.json"];
+    T1APIRespose *response = [T1APIRespose modelWithJson:data1];
+        NSLog(@"%@",response);
         //        for (WBStatus *status in item.statuses) {
         //            WBStatusLayout *layout = [[WBStatusLayout alloc] initWithStatus:status style:WBLayoutStyleTimeline];
         //            //                [layout layout];

@@ -102,7 +102,7 @@
                     }
                 }
             }];
-            customMapper = tmp.copy;
+            customMapper = tmp;
         }
     }
     NSMutableDictionary *allPropertys = [NSMutableDictionary dictionary];

@@ -52,7 +52,7 @@
              @"picIds" : @"pic_ids",
              @"picInfos" : @"pic_infos"};
 }
-+ (NSDictionary *)modelContainerPropertyGenericClass {
++ (NSDictionary *)modelCustomPropertyMapClass {
     return @{@"picIds" : [NSString class],
              @"picInfos" : [WBPicture class]};
 }
@@ -107,7 +107,7 @@
              @"mediaInfo" : @"media_info",
              @"typeIcon" : @"type_icon"};
 }
-+ (NSDictionary *)modelContainerPropertyGenericClass {
++ (NSDictionary *)modelCustomPropertyMapClass {
     return @{@"buttons" : [WBButtonLink class]};
 }
 @end
@@ -219,7 +219,7 @@
              @"inReplyToUserId" : @"in_reply_to_user_id",
              @"originalPic" : @"original_pic"};
 }
-+ (NSDictionary *)modelContainerPropertyGenericClass {
++ (NSDictionary *)modelCustomPropertyMapClass {
     return @{@"picIds" : [NSString class],
              @"picInfos" : [WBPicture class],
              @"urlStruct" : [WBURL class],
@@ -263,12 +263,10 @@
              @"sinceID" : @"since_id",
              @"nextCursor" : @"next_cursor"};
 }
-+ (nullable NSDictionary <NSString * , id>*)modelCustomPropertyMapClass;{
++ (nullable NSDictionary <NSString * , id>*)modelCustomPropertyMapClass{
     return @{@"statuses" : [WBStatus class]};
 }
-+ (NSDictionary *)modelContainerPropertyGenericClass {
-    return @{@"statuses" : [WBStatus class]};
-}
+
 @end
 
 
@@ -287,7 +285,7 @@
              @"displayOnly" : @"display_only",
              @"groupType" : @"group_type"};
 }
-+ (NSDictionary *)modelContainerPropertyGenericClass {
++ (NSDictionary *)modelCustomPropertyMapClass {
     return @{@"emoticons" : [WBEmoticon class]};
 }
 - (BOOL)modelCustomTransformFromDictionary:(NSDictionary *)dic {

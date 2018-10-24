@@ -389,7 +389,7 @@ void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretain
                     BOOL muti = propertyMeta.nsType == RCEncodingTypeNSMutableString;
                     // 处理运行时传入多种数据类型的情况
                     if ([value isKindOfClass:[NSString class]]) {
-                        ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter , (!muti ? (id)value : (id)(((NSString *)value).mutableCopy)));
+                        ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter , (!muti ? value : (((NSString *)value).mutableCopy)));
                     } else if ([value isKindOfClass:[NSNumber class]]){
                         ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter , (!muti ? ((NSNumber *)value).stringValue : ((NSNumber *)value).stringValue.mutableCopy));
                     } else if ([value isKindOfClass:[NSData class]]){
@@ -434,7 +434,7 @@ void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretain
                         if (propertyMeta.nsType == RCEncodingTypeNSData) {
                             ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,value);
                         } else {
-                            ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,((NSMutableData *)value).mutableCopy);
+                            ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,((NSData *)value).mutableCopy);
                         }
                     }else if ([value isKindOfClass:[NSString class]]){
                         NSData *data = [(NSString *)value dataUsingEncoding:NSUTF8StringEncoding];
@@ -501,7 +501,9 @@ void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretain
                                     NSObject *newObject = [newClass new];
                                     // 递归 json -> model
                                     [newObject modelSetWithDictionary:object];
-                                    [objectArr addObject:newObject];
+                                    if (newObject) {
+                                        [objectArr addObject:newObject];
+                                    }
                                 }
                             }
                             // 模型嵌套转化完毕，进行消息发送
@@ -521,31 +523,33 @@ void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretain
                 case RCEncodingTypeNSDictionary:
                 case RCEncodingTypeNSMutableDictionary:
                 {
-                    if (propertyMeta.mapperCls) {
-                        // 字典里含有多个模型映射
-                        NSMutableDictionary *mdic = [NSMutableDictionary dictionary];
-                        [((NSDictionary *)value) enumerateKeysAndObjectsUsingBlock:^(NSString *  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-                            if ([obj isKindOfClass:[NSDictionary class]]) {
-                                Class newClass = propertyMeta.mapperCls;
-                                if (propertyMeta.isHasCustomMapperDictionary) {
-                                    // 二次检测，返回一个最适合的类，继续递归魔性转换
-                                    newClass = [newClass modelCustomClassForDictionary:obj];
-                                    if (newClass == nil) {
-                                        newClass = propertyMeta.mapperCls;
+                    if ([value isKindOfClass:[NSDictionary class]]) {
+                        if (propertyMeta.mapperCls) {
+                            // 字典里含有多个模型映射
+                            NSMutableDictionary *mdic = [NSMutableDictionary dictionary];
+                            [((NSDictionary *)value) enumerateKeysAndObjectsUsingBlock:^(NSString *  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+                                if ([obj isKindOfClass:[NSDictionary class]]) {
+                                    Class newClass = propertyMeta.mapperCls;
+                                    if (propertyMeta.isHasCustomMapperDictionary) {
+                                        // 二次检测，返回一个最适合的类，继续递归魔性转换
+                                        newClass = [newClass modelCustomClassForDictionary:obj];
+                                        if (newClass == nil) {
+                                            newClass = propertyMeta.mapperCls;
+                                        }
+                                    }
+                                    NSObject *object = [newClass new];
+                                    [object modelSetWithDictionary:obj];
+                                    if (object != nil) {
+                                        mdic[key] = object;
                                     }
                                 }
-                                NSObject *object = [newClass new];
-                                [object modelSetWithDictionary:obj];
-                                if (obj != nil) {
-                                     mdic[key] = obj;
-                                }
-                            }
-                        }];
-                        ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,mdic);
-                        
-                    } else {
-                        BOOL muti = propertyMeta.nsType == RCEncodingTypeNSMutableDictionary;
-                        ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,!muti ?  value: ((NSDictionary *)value).mutableCopy);
+                            }];
+                            ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,mdic);
+                            
+                        } else {
+                            BOOL muti = propertyMeta.nsType == RCEncodingTypeNSMutableDictionary;
+                            ((void (*) (id , SEL , id))objc_msgSend)((id)model , propertyMeta.setter ,!muti ?  value: ((NSDictionary *)value).mutableCopy);
+                        }
                     }
                 }
                     break;
@@ -564,7 +568,9 @@ void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretain
                             NSMutableSet *valueSet = [NSMutableSet set] ;
                             for (id obj in set) {
                                 if ([set isKindOfClass:propertyMeta.mapperCls ]) {
-                                    [valueSet addObject:obj];
+                                    if (obj) {
+                                        [valueSet addObject:obj];
+                                    }
                                 } else {
                                     if ([obj isKindOfClass:[NSDictionary class]]) {
                                         Class newClass = propertyMeta.mapperCls;
@@ -573,7 +579,9 @@ void RCModelSetValueForProperty(__unsafe_unretained id model , __unsafe_unretain
                                         }
                                         NSObject *object = [newClass  new];
                                         [object modelSetWithDictionary:obj];
-                                        [valueSet addObject:object];
+                                        if (object) {
+                                             [valueSet addObject:object];
+                                        }
                                     }
                                 }
                             }

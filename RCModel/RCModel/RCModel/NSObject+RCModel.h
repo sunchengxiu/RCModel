@@ -26,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
  @return 转化后的 model
  */
 + (instancetype)modelWithJson:(id)json;
+- (BOOL)modelSetWithDictionary:(NSDictionary *)dic;
++ (instancetype)modelWithDictionary:(NSDictionary *)dic;
 @end
 
 NS_ASSUME_NONNULL_END
