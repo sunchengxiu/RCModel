@@ -1,5 +1,5 @@
 //
-//  RCModelTool.h
+//  RCModelFormater.h
 //  RCModel
 //
 //  Copyed and modified  by 孙承秀 on 2018/10/15.
@@ -18,7 +18,7 @@
 #import "RCModelPropertyMeta.h"
 NS_ASSUME_NONNULL_BEGIN
 
-@interface RCModelTool : NSObject
+@interface RCModelFormater : NSObject
 
 /**
  获取该类是属于哪个系统 NS 类的

@@ -13,7 +13,7 @@
 		E86B1265213642B3008858DC /* son.m in Sources */ = {isa = PBXBuildFile; fileRef = E86B1264213642B3008858DC /* son.m */; };
 		E875A67A2175C791003F9B52 /* RCModelMeta.m in Sources */ = {isa = PBXBuildFile; fileRef = E875A6792175C791003F9B52 /* RCModelMeta.m */; };
 		E875A67F2175EFB5003F9B52 /* RCModelPropertyMeta.m in Sources */ = {isa = PBXBuildFile; fileRef = E875A67E2175EFB5003F9B52 /* RCModelPropertyMeta.m */; };
-		E875A6872176D5D0003F9B52 /* RCModelTool.m in Sources */ = {isa = PBXBuildFile; fileRef = E875A6862176D5D0003F9B52 /* RCModelTool.m */; };
+		E875A6872176D5D0003F9B52 /* RCModelFormater.m in Sources */ = {isa = PBXBuildFile; fileRef = E875A6862176D5D0003F9B52 /* RCModelFormater.m */; };
 		E875A6B6217DDE49003F9B52 /* weibo_0.json in Resources */ = {isa = PBXBuildFile; fileRef = E875A6AE217DDE49003F9B52 /* weibo_0.json */; };
 		E875A6BC217DE2F0003F9B52 /* WBModel.m in Sources */ = {isa = PBXBuildFile; fileRef = E875A6BA217DE2F0003F9B52 /* WBModel.m */; };
 		E875A6BD217DE46B003F9B52 /* weibo_0.json in Sources */ = {isa = PBXBuildFile; fileRef = E875A6AE217DDE49003F9B52 /* weibo_0.json */; };
@@ -62,8 +62,8 @@
 		E875A67D2175EFB5003F9B52 /* RCModelPropertyMeta.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCModelPropertyMeta.h; sourceTree = "<group>"; };
 		E875A67E2175EFB5003F9B52 /* RCModelPropertyMeta.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCModelPropertyMeta.m; sourceTree = "<group>"; };
 		E875A6812175F8B9003F9B52 /* RCModelDefine.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCModelDefine.h; sourceTree = "<group>"; };
-		E875A6852176D5D0003F9B52 /* RCModelTool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCModelTool.h; sourceTree = "<group>"; };
-		E875A6862176D5D0003F9B52 /* RCModelTool.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCModelTool.m; sourceTree = "<group>"; };
+		E875A6852176D5D0003F9B52 /* RCModelFormater.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RCModelFormater.h; sourceTree = "<group>"; };
+		E875A6862176D5D0003F9B52 /* RCModelFormater.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RCModelFormater.m; sourceTree = "<group>"; };
 		E875A6AE217DDE49003F9B52 /* weibo_0.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = weibo_0.json; sourceTree = "<group>"; };
 		E875A6BA217DE2F0003F9B52 /* WBModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WBModel.m; sourceTree = "<group>"; };
 		E875A6BB217DE2F0003F9B52 /* WBModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WBModel.h; sourceTree = "<group>"; };
@@ -126,8 +126,8 @@
 				E875A6792175C791003F9B52 /* RCModelMeta.m */,
 				E875A67D2175EFB5003F9B52 /* RCModelPropertyMeta.h */,
 				E875A67E2175EFB5003F9B52 /* RCModelPropertyMeta.m */,
-				E875A6852176D5D0003F9B52 /* RCModelTool.h */,
-				E875A6862176D5D0003F9B52 /* RCModelTool.m */,
+				E875A6852176D5D0003F9B52 /* RCModelFormater.h */,
+				E875A6862176D5D0003F9B52 /* RCModelFormater.m */,
 				E84D498B2132884C0078B0D3 /* NSObject+RCModel.h */,
 				E84D498C2132884C0078B0D3 /* NSObject+RCModel.m */,
 			);
@@ -344,7 +344,7 @@
 				E875A6BD217DE46B003F9B52 /* weibo_0.json in Sources */,
 				E8C1703E217F2DE40065ED5D /* T1Model.m in Sources */,
 				E875A6BC217DE2F0003F9B52 /* WBModel.m in Sources */,
-				E875A6872176D5D0003F9B52 /* RCModelTool.m in Sources */,
+				E875A6872176D5D0003F9B52 /* RCModelFormater.m in Sources */,
 				E8E944A2213287A10018A832 /* ViewController.m in Sources */,
 				E8E944AD213287A30018A832 /* main.m in Sources */,
 				E86B12612136331C008858DC /* person.m in Sources */,

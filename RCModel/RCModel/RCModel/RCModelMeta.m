@@ -17,7 +17,7 @@
 #import "RCClassInfo.h"
 #import "RCModelProtocol.h"
 #import "RCModelPropertyMeta.h"
-#import "RCModelTool.h"
+#import "RCModelFormater.h"
 #import <OBJC/runtime.h>
 @interface RCModelMeta()
 {

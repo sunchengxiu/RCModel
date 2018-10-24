@@ -1,5 +1,5 @@
 //
-//  RCModelTool.m
+//  RCModelFormater.m
 //  RCModel
 //
 //  Copyed and modified by 孙承秀 on 2018/10/15.
@@ -12,7 +12,7 @@
 //  This source code is licensed under the MIT-style license found in the
 //  LICENSE file in the root directory of this source tree.
 //
-#import "RCModelTool.h"
+#import "RCModelFormater.h"
 #import <OBJC/message.h>
 #import "NSObject+RCModel.h"
 #import "RCModelProtocol.h"
@@ -20,7 +20,7 @@
 @interface NSObject()
 - (BOOL)modelSetWithDictionary:(NSDictionary *)dic;
 @end
-@implementation RCModelTool
+@implementation RCModelFormater
 RCEncodingNSType RCClassGetNSType(Class cls) {
     if (!cls) return RCEncodingTypeNSUnknown;
     if ([cls isSubclassOfClass:[NSMutableString class]]) return RCEncodingTypeNSMutableString;

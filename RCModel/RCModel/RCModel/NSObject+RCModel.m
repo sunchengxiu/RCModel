@@ -16,7 +16,7 @@
 #import "RCModelMeta.h"
 #import "RCModelProtocol.h"
 #import "RCModelPropertyMeta.h"
-#import "RCModelTool.h"
+#import "RCModelFormater.h"
 typedef struct {
     // 要设置的实体对象
     void *model;
