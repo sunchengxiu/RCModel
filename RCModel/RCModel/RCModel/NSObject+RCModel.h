@@ -18,6 +18,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface NSObject (RCModel)
+#pragma mark - json -> model
 
 /**
  将 json 转化为 model（可识别 NSData ， NSString ， NSDictionary），会先将传进来的数据格式化成 dic ， 然后调用下面的方法。
@@ -51,6 +52,15 @@ NS_ASSUME_NONNULL_BEGIN
  @return 是否转换成功
  */
 - (BOOL)modelSetWithDictionary:(NSDictionary *)dic;
+
+#pragma mark - model -> json
+
+/**
+ model -> json
+
+ @return 转化好的数据
+ */
+- (nullable id)modelToJsonObject;
 
 @end
 

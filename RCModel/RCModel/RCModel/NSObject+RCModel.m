@@ -69,6 +69,8 @@ static void SetModelWithDictionary(const void *key , const void *value , void *c
     }
 }
 
+#pragma mark - json -> model
+
 /**
  将 json 转化为 model（可识别 NSData ， NSString ， NSDictionary）
 
@@ -175,6 +177,15 @@ static void SetModelWithDictionary(const void *key , const void *value , void *c
         return [(id<RCModelProtocol>)self modelCustomTransformFromDictionary:dic];
     }
     return YES;
+}
+
+#pragma mark - model -> json
+-(id)modelToJsonObject{
+    id value = ModelToJSONObjectRecursive(self);
+    if ([value isKindOfClass:[NSDictionary class]] || [value isKindOfClass:[NSArray class]]) {
+        return value;
+    }
+    return nil;
 }
 @end
 

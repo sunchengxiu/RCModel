@@ -969,7 +969,7 @@ id ModelToJSONObjectRecursive(NSObject *model) {
             }];
             
         } else {
-            if ([dic objectForKey:obj.mapToKey]) {
+            if (![dic objectForKey:obj.mapToKey]) {
                 dic[obj.mapToKey] = value;
             }
         }
