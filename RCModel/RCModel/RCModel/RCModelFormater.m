@@ -25,14 +25,78 @@
 static force_inline NSNumber *ModelCreateNumberFromProperty(__unsafe_unretained id model,
                                                             __unsafe_unretained RCModelPropertyMeta *meta) {
     // 通过get方法获取值
-//    switch (<#expression#>) {
-//        case <#constant#>:
-//            <#statements#>
-//            break;
-//            
-//        default:
-//            break;
-//    }
+    switch (meta.encodingType & RCEncodingTypeMask) {
+        case RCEncodingTypeBool:
+        {
+            return @(((bool (*) (id , SEL))objc_msgSend)((id)model , meta.getter));
+        }
+            break;
+            case RCEncodingTypeInt8:
+        {
+            return @(((int8_t (*) (id , SEL))objc_msgSend)((id)model , meta.getter));
+        }
+            break;
+            case RCEncodingTypeUInt8:
+        {
+            return @(((uint8_t (*) (id , SEL))objc_msgSend)((id)model , meta.getter));
+        }
+            break;
+            case RCEncodingTypeInt16:
+        {
+            return @(((int16_t (*) (id , SEL))objc_msgSend)((id)model , meta.getter));
+        }
+            break;
+        case RCEncodingTypeUInt16:
+        {
+            return @(((uint16_t (*) (id , SEL))objc_msgSend)((id)model , meta.getter));
+        }
+            break;
+        case RCEncodingTypeInt32:
+        {
+            return @(((int32_t (*) (id , SEL))objc_msgSend)((id)model , meta.getter));
+        }
+            break;
+        case RCEncodingTypeUInt32:
+        {
+            return @(((uint32_t (*) (id , SEL))objc_msgSend)((id)model , meta.getter));
+        }
+            break;
+        case RCEncodingTypeInt64:
+        {
+            return @(((int64_t (*) (id , SEL))objc_msgSend)((id)model , meta.getter));
+        }
+            break;
+        case RCEncodingTypeUInt64:
+        {
+            return @(((uint64_t (*) (id , SEL))objc_msgSend)((id)model , meta.getter));
+        }
+            break;
+        case RCEncodingTypeFloat:
+        {
+            float f = ((float (*) (id , SEL))objc_msgSend)((id)model , meta.getter);
+            if (isnan(f) || isinf(f)) return nil;
+            return @(f);
+        }
+            break;
+        case RCEncodingTypeDouble:
+        {
+            double d = ((double (*) (id , SEL))objc_msgSend)((id)model , meta.getter);
+            if (isnan(d) || isinf(d)) return nil;
+            return @(d);
+        }
+            break;
+        case RCEncodingTypeLongDouble:
+        {
+            double d = ((long double (*) (id , SEL))objc_msgSend)((id)model , meta.getter);
+            if (isnan(d) || isinf(d)) return nil;
+            return @(d);
+        }
+            break;
+            
+        default:
+            return nil;
+            break;
+    }
     
 }
 static force_inline NSDateFormatter *RCISODateFormatter() {
@@ -820,6 +884,7 @@ id ModelToJSONObjectRecursive(NSObject *model) {
     }
     NSMutableDictionary *result = [NSMutableDictionary dictionary];
     __unsafe_unretained NSMutableDictionary *dic = result;
+    // 模型转化为字典
     [modelMeta.mapper enumerateKeysAndObjectsUsingBlock:^(NSString *  _Nonnull key, RCModelPropertyMeta *  _Nonnull obj, BOOL * _Nonnull stop) {
         if (!key) {
             return ;
@@ -828,9 +893,93 @@ id ModelToJSONObjectRecursive(NSObject *model) {
         if (!obj.getter) {
             return;
         }
-        
+        id value = nil;
+        if (obj.isCNumber) {
+            value = ModelCreateNumberFromProperty(model, obj);
+        } else if (obj.nsType) {
+            id v = ((id (*) (id , SEL))objc_msgSend)((id)model , obj.getter);
+            value = ModelToJSONObjectRecursive(v);
+        } else {
+            switch (obj.encodingType & RCEncodingTypeMask) {
+                case RCEncodingTypeClass:
+                    {
+                        Class cls = ((Class (*) (id , SEL))objc_msgSend)((id)model , obj.getter);
+                        if (cls) {
+                            value = cls ? NSStringFromClass(cls) : nil;
+                        } else {
+                            value = nil;
+                        }
+                    }
+                    break;
+                    case RCEncodingTypeObject:
+                {
+                    id v = ((id (*) (id , SEL))objc_msgSend)((id)model , obj.getter);
+                    value = ModelToJSONObjectRecursive(v);
+                    if (value == (id)kCFNull) {
+                        value = nil;
+                    }
+                }
+                    break;
+                    case RCEncodingTypeSEL:
+                {
+                    SEL sel = ((SEL (*) (id , SEL))objc_msgSend)((id)model , obj.getter);
+                    if (sel) {
+                        value = NSStringFromSelector(sel);
+                    } else {
+                        value = nil;
+                    }
+                }
+                    break;
+                default:
+                    break;
+            }
+        }
+        if (!value) {
+            return;
+        }
+        // value 获取完毕 ， 开始转换为字典
+        // 看是否有映射的情况 @[@"user",@"name"] - > @{@"user":{@"name":@"xxx"}}
+        if (obj.mapToKeyPath) {
+            __block NSMutableDictionary *superDic = dic;
+            __block NSMutableDictionary *subDic = nil;
+            [obj.mapToKeyPath enumerateObjectsUsingBlock:^(id  _Nonnull key, NSUInteger idx, BOOL * _Nonnull stop) {
+                NSString *mapkey = obj.mapToKeyPath[idx];
+                if (idx + 1 == obj.mapToKeyPath.count) {
+                    if (!superDic[mapkey]) {
+                        superDic[key] = value;
+                    }
+                    *stop = YES;
+                }
+                
+                subDic = superDic[mapkey];
+                if (subDic) {
+                    if ([subDic isKindOfClass:[NSDictionary class]]) {
+                        subDic = subDic.mutableCopy;
+                        superDic[mapkey] = subDic;
+                    } else {
+                        *stop = YES;
+                    }
+                } else {
+                    subDic = [NSMutableDictionary dictionary];
+                    superDic[mapkey] = subDic;
+                }
+                // 多级的情况，字典嵌套的情况，往下继续赋值
+                superDic = subDic;
+                subDic = nil;
+            }];
+            
+        } else {
+            if ([dic objectForKey:obj.mapToKey]) {
+                dic[obj.mapToKey] = value;
+            }
+        }
     }];
-    
-    return nil;
+    if (modelMeta.isHasCustomTransformToDic) {
+        BOOL success = [((id<RCModelProtocol>)model) modelCustomTransformToDictionary:dic];
+        if (!success) {
+            return nil;
+        }
+    }
+    return result;;
 }
 @end
